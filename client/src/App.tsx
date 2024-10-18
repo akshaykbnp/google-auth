@@ -1,19 +1,16 @@
 import './App.css'
 import Login from './components/login/Login'
-import Logout from './components/logout/Logout'
+import { Routes, Route } from "react-router-dom";
+import SignUp from './components/signup/Signup';
 
 function App() {
 
   return (
     <>
-      <h1>Implementing Google OAuth in MERN</h1>
-      <div className="center">
-        <Login />
-      </div>
-      <div className="center">
-        <Logout />
-      </div>
-
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
     </>
   )
 }
