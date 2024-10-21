@@ -1,22 +1,13 @@
 import express, {Request, Response} from "express";
-import { handleGetAllUsers } from "../controllers/UserController";
+import { handleGetAllUsers, handleGetUserDetails, handleUpdateUser, handleCreateUser } from "../controllers/userController";
+import { protectRoute } from "../middlewares/authMiddleware";
+
 
 const router = express.Router();
 
 
-router.get("/", async (req : Request, res : Response) => {
-    try{
-        const users = await handleGetAllUsers();
-        res.status(200).json(users);
-    }catch(err){
-        console.error("Error in / route:", err);
-        res.status(500).json({ status: "error", message: "Failed to fetch users" });
-    }
-
-})
-
-router.get("/:id", async (req, res) => {
-    
-});
-
+router.get("/", protectRoute,  handleGetAllUsers)
+router.get("/:id", protectRoute, handleGetUserDetails);
+router.patch("/:id", protectRoute, handleUpdateUser);
+router.post("/", handleCreateUser);
 export default router;

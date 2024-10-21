@@ -2,7 +2,7 @@ import express from "express";
 import { OAuth2Client } from "google-auth-library";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import User from './models/UserModel'
+
 import 'dotenv/config'
 
 const app = express();
@@ -17,11 +17,11 @@ const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
 const client = new OAuth2Client(CLIENT_ID);
 
-import UserRoute from "./routes/UserRoute";
 import connectMongoDb from "./connect";
+import UserRoute from "./routes/userRoute";
 
 
-app.use("/user", UserRoute);
+app.use("/auth/user", UserRoute);
 
 
 connectMongoDb(MONGO_DB);

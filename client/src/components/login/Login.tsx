@@ -17,10 +17,12 @@ import { useNavigate } from "react-router-dom";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-const API_GOOGLE_AUTH_URL = "http://localhost:3000/";
+const API_GOOGLE_AUTH_URL = "http://localhost:3000/auth/user";
 const API_URL = import.meta.env.VITE_LOGIN_API_URL;
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState<ILoginFormData>({
     email: "",
     password: "",
@@ -72,7 +74,9 @@ const LoginForm: React.FC = () => {
     try {
       const response = await axios.post(API_URL, formData);
 
-      if (response.status === 202) {
+      if (response.status === 200) {
+        const token = response.data.token;
+        localStorage.setItem("auth-token", token);
         console.log("login successfull");
       } else {
         console.log("error occured");
@@ -80,6 +84,7 @@ const LoginForm: React.FC = () => {
     } catch (err) {
       console.error(err);
     }
+        
   };
 
   const [loginData, setLoginData] = useState(
