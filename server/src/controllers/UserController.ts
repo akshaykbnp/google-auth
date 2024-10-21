@@ -4,7 +4,8 @@ import User from "../models/userModel";
 import { generateToken } from "../utils/token";
 import bcrypt from "bcrypt";
 import { getHashSalt } from "../utils/environments";
- 
+import { v4 as uuidv4 } from 'uuid'; // For generating random UUID
+
 
 export const handleGetAllUsers = async (req: Request, res: Response) => {
     try {
@@ -103,5 +104,41 @@ export const handleDeleteUser = async (req: Request, res: Response) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete user' + err })
+    }
+}
+
+
+export const handleCreateGuestUser = async (req : Request, res : Response) => {
+    try {
+        
+        const guestName = `Guest_${Math.random().toString(36).substring(2, 8)}`;
+        const guestUser = {
+            name : guestName, 
+            email : `${guestName}@guest.com`, 
+            password :  `${uuidv4().substring(0, 8)}#${Math.floor((Math.random() * 20) + 1).toString()}` 
+        }  
+
+        console.log("guest user", guestUser)
+        //hash password
+        const saltRounds = parseInt(getHashSalt()!) || 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(guestUser.password, salt);
+
+
+        const newUser = new User({
+            name: guestUser.name,
+            email: guestUser.email,
+            password: hash,
+        });
+
+        const user = await newUser.save()
+
+        const token = generateToken(user);
+
+        res.status(200).json({token});
+
+    } catch (err) {
+        console.error(err);    
+        res.status(500).json({ error: 'Failed to create' + err })
     }
 }
