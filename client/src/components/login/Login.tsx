@@ -77,6 +77,7 @@ const LoginForm: React.FC = () => {
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("auth-token", token);
+        navigate("/home");
         console.log("login successfull");
       } else {
         console.log("error occured");

@@ -1,15 +1,15 @@
 import express, {Request, Response} from "express";
-import { handleGetAllUsers, handleGetUserDetails, handleUpdateUser, handleCreateUser, handleCreateGuestUser } from "../controllers/userController";
-import { protectRoute } from "../middlewares/authMiddleware";
+import { handleGetAllUsers, handleGetUserDetails, handleUpdateUser, handleCreateGuestUser } from "../controllers/userController";
+import { checkToken, verifyRoute } from "../middlewares/authMiddleware";
 
 
 const router = express.Router();
 
 
-router.get("/", protectRoute,  handleGetAllUsers)
-router.get("/:id", protectRoute, handleGetUserDetails);
-router.patch("/:id", protectRoute, handleUpdateUser);
-router.post("/", handleCreateUser);
-router.post("/guest", handleCreateGuestUser);
+router.get("/", checkToken, verifyRoute,  handleGetAllUsers)   //Get all users (Admin only)
+router.get("/:id", checkToken, verifyRoute, handleGetUserDetails);  //Get user profile by ID
+router.patch("/:id", checkToken, verifyRoute, handleUpdateUser);   //Update user profile
+router.delete("/:id", () => {});   //Delete user
+router.post("/guest", handleCreateGuestUser);  //Create guest user
 
 export default router;

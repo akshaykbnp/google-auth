@@ -1,11 +1,12 @@
 
 import { Request, Response } from "express";
 import User from "../models/userModel";
-import { generateToken } from "../utils/token";
 import bcrypt from "bcrypt";
-import { getHashSalt } from "../utils/environments";
+import { getHashSalt, getJWTSecretKey } from "../utils/environments";
 import { v4 as uuidv4 } from 'uuid'; // For generating random UUID
-
+import { Schema } from "mongoose";
+import jwt from "jsonwebtoken";
+import { JwtPayload } from "../interfaces/jwtPayload";
 
 export const handleGetAllUsers = async (req: Request, res: Response) => {
     try {
@@ -16,37 +17,6 @@ export const handleGetAllUsers = async (req: Request, res: Response) => {
         res.status(500).json({ status: "error", message: "Failed to fetch users" });
     }
 }
-
-export const handleCreateUser = async (req: Request, res: Response) => {
-    try {
-        const { fullName, email, password, cpassword } = req.body;
-
-        
-        //hash password
-        const saltRounds = parseInt(getHashSalt()!) || 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(password, salt);
-
-
-        const newUser = new User({
-            name: fullName,
-            email: email,
-            password: hash,
-        });
-
-        console.log(newUser);
-        const user = await newUser.save()
-
-        const token = generateToken(user);
-
-       
-        res.status(200).json({token});
-    } catch (err) {
-        console.error(err);    
-        res.status(500).json({ error: 'Failed to create' + err })
-    }
-}
-
 
 export const handleUpdateUser = async (req: Request, res: Response) => {
     try {
@@ -133,7 +103,14 @@ export const handleCreateGuestUser = async (req : Request, res : Response) => {
 
         const user = await newUser.save()
 
-        const token = generateToken(user);
+        const secretKey = getJWTSecretKey();
+
+        if (!secretKey) throw new Error("secret key not found");
+
+        // Prepare the JWT payload
+        const payload: JwtPayload = { userId: (user._id as Schema.Types.ObjectId).toString(), email: user.email , name : user.name};
+
+        const token = jwt.sign(payload, secretKey, { expiresIn: '30d' });
 
         res.status(200).json({token});
 

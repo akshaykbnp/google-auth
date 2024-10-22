@@ -70,10 +70,10 @@ const SignUpForm: React.FC = () => {
         if (res.status === 200) {
           const token = res.data.token;
           localStorage.setItem("auth-token", token);
-          navigate("/login");
-          console.log("Sign Up successful");
+          navigate("/home");
+          console.log("Sign Up successful", token);
         } else {
-          console.log("Error occurred");
+          console.log("Error occurred during sign up", res.status);
         }
       } catch (err) {
         console.error(err);
